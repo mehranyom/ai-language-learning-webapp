@@ -1,0 +1,13 @@
+<h1>{{ job.title|default:"(untitled)" }}</h1>
+<p>Status: {{ job.status }}</p>
+<p>YouTube ID: {{ job.youtube_id }}</p>
+<p>Duration: {{ job.duration_sec }} sec</p>
+{% if job.source_audio %}
+  <p>Source audio: <a href="{{ job.source_audio.url }}">{{ job.source_audio.name }}</a></p>
+{% endif %}
+{% if job.wav_audio %}
+  <p>WAV (16k mono): <a href="{{ job.wav_audio.url }}">{{ job.wav_audio.name }}</a></p>
+{% endif %}
+{% if job.error_message %}
+  <pre>{{ job.error_message }}</pre>
+{% endif %}

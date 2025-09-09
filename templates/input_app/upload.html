@@ -1,0 +1,5 @@
+<form method="post" action="{% url 'submit_url' %}">
+    {% csrf_token %}
+    <input type="url" name="youtube_url" placeholder="Paste YouTube URL" required style="width:420px">
+    <button type="submit">Process</button>
+  </form>
