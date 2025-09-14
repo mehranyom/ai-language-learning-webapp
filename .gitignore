@@ -18,3 +18,4 @@ media/
 .env
 *.env
 .env.*
+credentials/*.json

@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from google.oauth2 import service_account
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'input_app',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -126,3 +129,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+GS_BUCKET_NAME = "llprojectbucket"
+GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
+    BASE_DIR / "credentials" / "gcs-service-account.json"
+)
