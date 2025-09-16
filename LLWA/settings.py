@@ -27,8 +27,16 @@ SECRET_KEY = 'django-insecure-$c(2q)$j=q*^v+e4b&-8_b+vxl1#mw@-j7v3sc)x)b6fcy*em=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "[::1]",
+    ".trycloudflare.com",   # allow ANY subdomain of trycloudflare.com
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.trycloudflare.com",
+]
 
 # Application definition
 
@@ -136,3 +144,5 @@ GS_BUCKET_NAME = "llprojectbucket"
 GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
     BASE_DIR / "credentials" / "gcs-service-account.json"
 )
+
+WORKER_API_TOKEN = "super-secret-token"  # later: move to env var

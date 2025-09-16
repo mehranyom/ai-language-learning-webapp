@@ -38,8 +38,9 @@ class TranscriptionJob(models.Model):
         ("transcribing", "Transcribing"),
         ("ready", "Ready"),
         ("failed", "Failed"),
+        ("awaiting_transcription", "Awaiting_transcription"),
     ]
-    status = models.CharField(max_length=20, choices=STATUS, default="queued")
+    status = models.CharField(max_length=32, choices=STATUS, default="queued")
     error_message = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

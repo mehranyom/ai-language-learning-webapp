@@ -77,6 +77,6 @@ def prepare_job_files(job, media_dir: str):
     with open(wav_tmp, "rb") as f:
         job.wav_audio.save("audio_16k.wav", File(f), save=False)
 
-    # We stop here (no transcription yet)
-    job.status = "ready"
+    # wait for transcription
+    job.status = "awaiting_transcription"
     job.save()

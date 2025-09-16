@@ -11,3 +11,10 @@
 {% if job.error_message %}
   <pre>{{ job.error_message }}</pre>
 {% endif %}
+
+{% if job.transcript_json %}
+  <p><a href="{{ job.transcript_json.url }}" target="_blank" rel="noopener">Download transcript.json</a></p>
+{% endif %}
+{% if job.transcript_vtt %}
+  <p><a href="{{ job.transcript_vtt.url }}" target="_blank" rel="noopener">Download transcript.vtt</a></p>
+{% endif %}
