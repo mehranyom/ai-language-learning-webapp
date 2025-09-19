@@ -1,12 +1,16 @@
 import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
+
 
 def job_dir(instance, filename):
     # jobs/YYYY/MM/DD/<job_uuid>/<filename>
     return f"jobs/{instance.created_at:%Y/%m/%d}/{instance.job_uuid}/{filename}"
 
 class TranscriptionJob(models.Model):
+    def __str__(self):
+        return f"{self.title} - {self.job_uuid} - {self.status}"
     # Ownership
     owner = models.ForeignKey(get_user_model(), null=True, blank=True, on_delete=models.SET_NULL)
 
@@ -45,6 +49,10 @@ class TranscriptionJob(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Extend model for proccess bar
+    percent = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+    message = models.CharField(max_length=300)
 
     @property
     def is_ready(self):

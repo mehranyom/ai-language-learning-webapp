@@ -146,3 +146,15 @@ GS_CREDENTIALS = service_account.Credentials.from_service_account_file(
 )
 
 WORKER_API_TOKEN = "super-secret-token"  # later: move to env var
+
+
+# Celery broker/result (Redis local)
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+CELERY_TASK_ALWAYS_EAGER = False  # True runs tasks inline (for quick debugging)
+
+# Optional: JSON serializer (safe defaults)
+CELERY_TASK_SERIALIZER = "json"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
