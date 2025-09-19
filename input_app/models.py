@@ -50,9 +50,10 @@ class TranscriptionJob(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Extend model for proccess bar
-    percent = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-    message = models.CharField(max_length=300)
+    # Extend model for proccess bar using celery
+    step = models.CharField(max_length=32, choices=STATUS, default="queued")
+    percent = models.PositiveSmallIntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)], default=0)
+    message = models.CharField(max_length=300, blank=True)
 
     @property
     def is_ready(self):

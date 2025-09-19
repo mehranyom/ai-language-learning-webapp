@@ -6,6 +6,8 @@ from django.views.decorators.http import require_http_methods
 from .models import TranscriptionJob
 from .services import prepare_job_files
 from django.http import HttpResponse
+from input_app.tasks import prepare_audio
+
 
 # input_app/views.py
 
@@ -25,13 +27,14 @@ def submit_url(request):
         owner=request.user if request.user.is_authenticated else None,
         status="queued",
     )
-    try:
-        media_dir = settings.MEDIA_ROOT  # dev: useu MEDIA_ROOT as scratch
-        prepare_job_files(job, media_dir)
-    except Exception as e:
-        job.status = "failed"
-        job.error_message = str(e)
-        job.save()
+    # try:
+    #     media_dir = settings.MEDIA_ROOT  # dev: useu MEDIA_ROOT as scratch
+    #     prepare_job_files(job, media_dir)
+    # except Exception as e:
+    #     job.status = "failed"
+    #     job.error_message = str(e)
+    #     job.save()
+    prepare_audio.delay(job.id)
     return redirect("job_detail", job_uuid=str(job.job_uuid))
 
 def job_detail(request, job_uuid):
