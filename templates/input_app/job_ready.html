@@ -1,0 +1,44 @@
+<h2>{{ job.title }}</h2>
+
+<div>
+  <iframe width="560" height="315"
+          src="https://www.youtube.com/embed/{{ job.youtube_id }}"
+          frameborder="0"
+          allowfullscreen></iframe>
+</div>
+
+<h3>Transcript</h3>
+{% if job.transcript_vtt_url %}
+  <a href="{{ job.transcript_vtt_url }}" target="_blank">Download VTT</a>
+{% endif %}
+{% if json_url %}<a href="{{ json_url }}" target="_blank">transcript.json</a>{% endif %}
+{% if vtt_url %}<a href="{{ vtt_url }}" target="_blank">transcript.vtt</a>{% endif %}<pre id="transcript">
+    <video controls>
+        <source src="{{ wav_url }}" type="audio/wav">
+        <track src="{{ vtt_url }}" kind="subtitles" srclang="en" label="English" default>
+      </video>
+  {% if job.transcript_json %}
+    <!-- You could load JSON and render with JS -->
+    Transcript available.
+    {{ job.transcript_json }}
+  {% else %}
+    No transcript yet.
+  {% endif %}
+
+<div id="transcript-box"></div>
+
+<script>
+async function loadTranscript(vttUrl) {
+  try {
+    const resp = await fetch(vttUrl);
+    if (!resp.ok) throw new Error("Failed to load VTT");
+    const text = await resp.text();
+    // Show raw VTT text
+    document.getElementById("transcript-box").textContent = text;
+  } catch (e) {
+    console.error(e);
+  }
+}
+loadTranscript("{{ vtt_url }}");
+</script>
+</pre>

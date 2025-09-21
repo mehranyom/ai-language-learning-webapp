@@ -14,6 +14,7 @@ from pathlib import Path
 from google.oauth2 import service_account
 import os
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -158,3 +159,14 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+
+# Make each HTTP chunk short so none runs >120s
+GS_BLOB_CHUNK_SIZE = 5 * 1024 * 1024   # 5 MB
+GS_MAX_MEMORY_SIZE = 2 * 1024 * 1024   # 2 MB
+
+# If your django-storages version supports it (most recent do):
+GS_DEFAULT_TIMEOUT = 300  # seconds (increase if you still see timeouts)
+
+# (Optional) Use storage endpoint (often more reliable than www.googleapis.com)
+GS_CLIENT_OPTIONS = {"api_endpoint": "https://storage.googleapis.com"}
+

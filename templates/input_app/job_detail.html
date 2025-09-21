@@ -1,20 +1,95 @@
-<h1>{{ job.title|default:"(untitled)" }}</h1>
-<p>Status: {{ job.status }}</p>
-<p>YouTube ID: {{ job.youtube_id }}</p>
-<p>Duration: {{ job.duration_sec }} sec</p>
-{% if job.source_audio %}
-  <p>Source audio: <a href="{{ job.source_audio.url }}">{{ job.source_audio.name }}</a></p>
-{% endif %}
-{% if job.wav_audio %}
-  <p>WAV (16k mono): <a href="{{ job.wav_audio.url }}">{{ job.wav_audio.name }}</a></p>
-{% endif %}
-{% if job.error_message %}
-  <pre>{{ job.error_message }}</pre>
-{% endif %}
+<h2 id="job-title">{{ job.title|default:"(untitled)" }}</h2>
 
-{% if job.transcript_json %}
-  <p><a href="{{ job.transcript_json.url }}" target="_blank" rel="noopener">Download transcript.json</a></p>
-{% endif %}
-{% if job.transcript_vtt %}
-  <p><a href="{{ job.transcript_vtt.url }}" target="_blank" rel="noopener">Download transcript.vtt</a></p>
-{% endif %}
+<p>
+  <strong>Status:</strong> <span id="job-status">{{ job.status }}</span>
+  <span id="job-step-msg">
+    {% if job.step %} — {{ job.step }}{% endif %}
+    {% if job.message %} — {{ job.message }}{% endif %}
+  </span>
+</p>
+
+<p><strong>YouTube ID:</strong> <span id="job-yid">{{ job.youtube_id }}</span></p>
+<p><strong>Duration:</strong> <span id="job-duration">
+  {% if job.duration_sec %}{{ job.duration_sec|floatformat:0 }} sec{% else %}None sec{% endif %}
+</span></p>
+
+<div class="progress" style="width:100%; background:#eee; border-radius:8px; overflow:hidden; height:14px;">
+  <div id="bar" style="width: {{ job.percent|default:0 }}%; height:100%; background:#3b82f6; transition:width .2s;"></div>
+</div>
+<p id="msg" style="margin-top:.5rem;">
+  {{job.percent}} - {{ job.step }}{% if job.message %} — {{ job.message }}{% endif %}
+</p>
+
+
+<script>
+  (function(){
+    const statusUrl = "{% url 'job_status' job_uuid=job.job_uuid %}";
+    const readyRedirectUrl = "{% url 'job_detail' job_uuid=job.job_uuid %}"; // or your 'job_view' route
+  
+    const el = (id) => document.getElementById(id);
+    const fmtDur = (s) => {
+      s = Math.max(0, Math.floor(Number(s||0)));
+      const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+      return (h? h+":" : "") + String(m).padStart(2,'0') + ":" + String(sec).padStart(2,'0');
+    };
+  
+    async function poll(){
+      try{
+        const r = await fetch(statusUrl, {headers:{'Accept':'application/json'}});
+        if(!r.ok) throw new Error('bad status '+r.status);
+        const s = await r.json();
+  
+        // progress bar + message
+        el('bar').style.width = (s.percent ?? 0) + '%';
+        el('bar').style.background = s.status === 'failed' ? '#e11d48'
+                                   : s.status === 'ready'  ? '#10b981'
+                                   : '#3b82f6';
+        el('msg').textContent = (s.percent ?? 0) + "% — " +
+                        (s.step || s.status || '') +
+                        (s.message ? ' — ' + s.message : '');
+  
+        // text fields
+        if (s.title)       el('job-title').textContent = s.title;
+        if (s.youtube_id)  el('job-yid').textContent   = s.youtube_id;
+        el('job-status').textContent = s.status || '';
+        el('job-duration').textContent = s.duration_sec ? (fmtDur(s.duration_sec)) : 'None sec';
+  
+        // optional auto-redirect when ready
+        if (s.status === 'ready') {
+          // change to your final page if different
+          window.location.href = readyRedirectUrl;
+          return;
+        }
+      }catch(e){
+        // keep polling even if a transient error occurs
+        // console.warn(e);
+      }
+      setTimeout(poll, 1500);
+    }
+    poll();
+  })();
+  </script>
+  <script>
+    function pollStatus() {
+      fetch("{% url 'job_status' job.job_uuid %}")
+        .then(resp => resp.json())
+        .then(data => {
+          document.getElementById("bar").style.width = data.percent + "%";
+          document.getElementById("msg").textContent =
+            data.percent + "% — " + data.step + " — " + data.message;
+    
+          if (data.status === "ready") {
+            // Redirect to ready page
+            window.location.href = "{% url 'job_ready' job.job_uuid %}";
+          } else {
+            setTimeout(pollStatus, 3000); // poll again in 3s
+          }
+        })
+        .catch(err => {
+          console.error("poll failed", err);
+          setTimeout(pollStatus, 5000);
+        });
+    }
+    
+    pollStatus();
+    </script>
