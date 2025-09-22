@@ -13,6 +13,11 @@ def signed_get_url(object_key, minutes=15):
     blob = client.bucket(settings.GS_BUCKET_NAME).blob(object_key)
     return blob.generate_signed_url(version="v4", expiration=timedelta(minutes=minutes), method="GET")
 
+def vtt_text(object_key):
+    client = gcs_client()
+    blob = client.bucket(settings.GS_BUCKET_NAME).blob(object_key)
+    return blob.download_as_text()
+
 def signed_put_url(object_key, content_type, minutes=15):
     client = gcs_client()
     blob = client.bucket(settings.GS_BUCKET_NAME).blob(object_key)

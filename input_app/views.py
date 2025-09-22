@@ -8,7 +8,7 @@ from input_app.tasks import prepare_audio
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .gcs_utils import signed_get_url
+from .gcs_utils import signed_get_url, vtt_text
 
 
 # input_app/views.py
@@ -86,6 +86,8 @@ def job_ready(request, job_uuid):
     vtt_url  = signed_get_url(job.transcript_vtt.name)  if job.transcript_vtt  else None
     mp3_url  = signed_get_url(job.source_audio.name)    if job.source_audio    else None
     wav_url  = signed_get_url(job.wav_audio.name)       if job.wav_audio       else None
+    
+    vtt_txt = vtt_text(job.transcript_vtt.name) if job.transcript_vtt  else None
 
     return render(request, "input_app/job_ready.html", {
         "job": job,
@@ -93,5 +95,6 @@ def job_ready(request, job_uuid):
         "vtt_url": vtt_url,
         "mp3_url": mp3_url,
         "wav_url": wav_url,
+        "vtt_txt": vtt_txt,
     })
     # return render(request, "input_app/job_ready.html", {"job": job})

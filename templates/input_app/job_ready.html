@@ -11,6 +11,9 @@
 {% if job.transcript_vtt_url %}
   <a href="{{ job.transcript_vtt_url }}" target="_blank">Download VTT</a>
 {% endif %}
+
+<p>{{vtt_txt}}</p>
+
 {% if json_url %}<a href="{{ json_url }}" target="_blank">transcript.json</a>{% endif %}
 {% if vtt_url %}<a href="{{ vtt_url }}" target="_blank">transcript.vtt</a>{% endif %}<pre id="transcript">
     <video controls>
